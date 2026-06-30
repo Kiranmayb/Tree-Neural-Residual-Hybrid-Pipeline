@@ -30,18 +30,11 @@ class TreeNeuralHybridPipeline:
         return X, y
 
     def fit(self, X: np.ndarray, y: np.ndarray):
-        # 1. Train Base Model (Decision Tree)
         self.base_tree.fit(X, y)
         base_preds = self.base_tree.predict(X)
-
-        # 2. Compute Residuals (Errors)
         residuals = y - base_preds
-
-        # 3. Convert to Tensors for PyTorch
         X_tensor = torch.tensor(X, dtype=torch.float32)
         res_tensor = torch.tensor(residuals, dtype=torch.float32).unsqueeze(1)
-
-        # 4. Train Neural Network on Residuals
         criterion = nn.MSELoss()
         optimizer = optim.Adam(self.residual_nn.parameters(), lr=self.lr)
 
@@ -69,7 +62,6 @@ class TreeNeuralHybridPipeline:
         X_plot = np.linspace(0, 12, 500).reshape(-1, 1)
         tree_preds = self.base_tree.predict(X_plot)
         hybrid_preds = self.predict(X_plot)
-
         plt.figure(figsize=(10, 6))
         plt.scatter(X, y, color='gray', alpha=0.5, label='Actual Data')
         plt.plot(X_plot, tree_preds, label='Tree Only (Macro-Trend)', color='blue', linestyle='--')
